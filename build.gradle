@@ -133,7 +133,10 @@ dependencies {
     implementation('net.dv8tion:JDA:5.2.1') {
         exclude group: 'org.slf4j', module: 'slf4j-api'
     }
-    jarJar('net.dv8tion:JDA:5.2.1') { exclude module: 'opus-java' }
+    jarJar('net.dv8tion:JDA:5.2.1') {
+        exclude module: 'opus-java'
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+    }
 
     // Example mod dependency using a file as dependency
     // implementation files("libs/coolmod-${mc_version}-${coolmod_version}.jar")

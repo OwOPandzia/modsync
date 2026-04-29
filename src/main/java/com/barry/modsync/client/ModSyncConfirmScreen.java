@@ -66,7 +66,7 @@ public class ModSyncConfirmScreen extends Screen {
         modList = new ModList(this.minecraft, this.width,
                 listBottom - listTop, listTop, 26);
         for (DisplayEntry entry : displayEntries)
-            modList.addEntry(new ModList.ModRow(entry, this));
+            modList.addModEntry(new ModList.ModRow(entry, this));
         this.addRenderableWidget(modList);
 
         // ── Bottom button bar ─────────────────────────────────────────────
@@ -187,6 +187,10 @@ public class ModSyncConfirmScreen extends Screen {
     // ── Mod list ─────────────────────────────────────────────────────────────
 
     static class ModList extends ObjectSelectionList<ModList.ModRow> {
+
+        public void addModEntry(ModRow row) {
+            this.addEntry(row);
+        }
 
         ModList(Minecraft mc, int width, int height, int y, int itemH) {
             super(mc, width, height, y, itemH);
