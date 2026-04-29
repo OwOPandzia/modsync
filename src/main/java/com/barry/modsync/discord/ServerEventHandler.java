@@ -7,6 +7,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.ServerChatEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
+import java.util.concurrent.CompletableFuture;
+
 @EventBusSubscriber(modid = "modsync")
 public class ServerEventHandler {
 
@@ -34,14 +36,17 @@ public class ServerEventHandler {
         MinecraftServer server = player.getServer();
         if (server == null) return;
 
-        // Schedule for next tick so the player list count is already updated
-        server.execute(() -> discord.sendPlayerJoin(
-                player.getName().getString(),
-                player.getUUID().toString(),
-                server.getPlayerList().getPlayerCount(),
-                server.getPlayerList().getMaxPlayers()
-        ));
-        server.execute(discord::updateActivity);
+        // 1. Zbieramy wszystkie dane z gry NA GŁÓWNYM WĄTKU (bezpieczne dla serwera)
+        String playerName = player.getName().getString();
+        String playerUuid = player.getUUID().toString();
+        int playerCount = server.getPlayerList().getPlayerCount();
+        int maxPlayers = server.getPlayerList().getMaxPlayers();
+
+        // 2. Wysyłamy do Discorda W TLE (nie blokuje serwera!)
+        CompletableFuture.runAsync(() -> {
+            discord.sendPlayerJoin(playerName, playerUuid, playerCount, maxPlayers);
+            discord.updateActivity();
+        });
     }
 
     @SubscribeEvent
@@ -51,12 +56,16 @@ public class ServerEventHandler {
         MinecraftServer server = player.getServer();
         if (server == null) return;
 
-        server.execute(() -> discord.sendPlayerLeave(
-                player.getName().getString(),
-                player.getUUID().toString(),
-                server.getPlayerList().getPlayerCount(),
-                server.getPlayerList().getMaxPlayers()
-        ));
-        server.execute(discord::updateActivity);
+        // W momencie opuszczania gry, gracz jest nadal wliczony do playerCount,
+        // więc odejmujemy 1, żeby Discord pokazał poprawną wartość po jego wyjściu.
+        String playerName = player.getName().getString();
+        String playerUuid = player.getUUID().toString();
+        int playerCount = server.getPlayerList().getPlayerCount() - 1;
+        int maxPlayers = server.getPlayerList().getMaxPlayers();
+
+        CompletableFuture.runAsync(() -> {
+            discord.sendPlayerLeave(playerName, playerUuid, playerCount, maxPlayers);
+            discord.updateActivity();
+        });
     }
 }
