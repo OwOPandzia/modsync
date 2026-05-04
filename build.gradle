@@ -139,14 +139,25 @@ dependencies {
         exclude module: 'opus-java'
     }
 
+// WebSocket client (JDA gateway)
+    jarJar('com.neovisionaries:nv-websocket-client:[2.14,3)') {}
+
 // OkHttp (JDA HTTP client)
     jarJar('com.squareup.okhttp3:okhttp:[4.12.0,5)') {}
     jarJar('com.squareup.okio:okio:[3.6.0,4)') {}
     jarJar('com.squareup.okio:okio-jvm:[3.6.0,4)') {}
 
-// Kotlin stdlib (required by OkHttp 4.x which is written in Kotlin)
+// Kotlin stdlib (OkHttp is written in Kotlin)
     jarJar('org.jetbrains.kotlin:kotlin-stdlib:[1.9.0,2)') {}
     jarJar('org.jetbrains.kotlin:kotlin-stdlib-common:[1.9.0,2)') {}
+
+// Jackson (JDA JSON parsing)
+    jarJar('com.fasterxml.jackson.core:jackson-core:[2.17.0,3)') {}
+    jarJar('com.fasterxml.jackson.core:jackson-databind:[2.17.0,3)') {}
+    jarJar('com.fasterxml.jackson.core:jackson-annotations:[2.17.0,3)') {}
+
+// Commons Collections (JDA internal use)
+    jarJar('org.apache.commons:commons-collections4:[4.4,5)') {}
 
     // Example mod dependency using a file as dependency
     // implementation files("libs/coolmod-${mc_version}-${coolmod_version}.jar")
