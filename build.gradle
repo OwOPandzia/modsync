@@ -141,6 +141,11 @@ dependencies {
         exclude module: 'opus-java'
     }
 
+    jdaJar('com.squareup.okio:okio:[3.6.0,4)') {
+        exclude group: 'com.google.code.gson', module: 'gson'
+        exclude group: 'com.google.gson', module: 'gson'
+    }
+
     // Example mod dependency using a file as dependency
     // implementation files("libs/coolmod-${mc_version}-${coolmod_version}.jar")
 
@@ -223,6 +228,8 @@ afterEvaluate {
             'io.netty:netty-resolver',
             'commons-io:commons-io',
             'org.apache.commons:commons-lang3',
+            'com.squareup.okio:okio',
+            'com.google.code.gson:gson',
     ] as Set
 
     configurations.jdaJar.resolvedConfiguration.resolvedArtifacts.each { artifact ->
