@@ -202,12 +202,36 @@ idea {
     }
 }
 
-// Auto-bundle every transitive JDA dep so we never miss one
 afterEvaluate {
+    // These are already provided by NeoForge/Minecraft — never re-bundle them
+    def neoforgeProvided = [
+            'com.google.gson:gson',
+            'com.google.guava:guava',
+            'com.google.guava:failureaccess',
+            'com.google.code.findbugs:jsr305',
+            'com.google.errorprone:error_prone_annotations',
+            'com.google.j2objc:j2objc-annotations',
+            'org.checkerframework:checker-qual',
+            'org.slf4j:slf4j-api',
+            'org.apache.logging.log4j:log4j-api',
+            'org.apache.logging.log4j:log4j-core',
+            'io.netty:netty-common',
+            'io.netty:netty-buffer',
+            'io.netty:netty-transport',
+            'io.netty:netty-handler',
+            'io.netty:netty-codec',
+            'io.netty:netty-resolver',
+            'commons-io:commons-io',
+            'org.apache.commons:commons-lang3',
+    ] as Set
+
     configurations.jdaJar.resolvedConfiguration.resolvedArtifacts.each { artifact ->
         def id = artifact.moduleVersion.id
-        dependencies {
-            jarJar("${id.group}:${id.name}:${id.version}")
+        def coord = "${id.group}:${id.name}"
+        if (!neoforgeProvided.contains(coord)) {
+            dependencies {
+                jarJar("${id.group}:${id.name}:${id.version}")
+            }
         }
     }
 }
