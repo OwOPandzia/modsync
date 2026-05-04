@@ -130,6 +130,10 @@ dependencies {
     // The group id is ignored when searching -- in this case, it is "blank"
     // implementation "blank:coolmod-${mc_version}:${coolmod_version}"
 
+    jarJar('com.squareup.okhttp3:okhttp:[4.12.0,5)') {}
+    jarJar('com.squareup.okio:okio:[3.6.0,4)') {}
+    jarJar('com.squareup.okio:okio-jvm:[3.6.0,4)') {}
+
     implementation('net.dv8tion:JDA:5.2.1') {
         exclude group: 'org.slf4j', module: 'slf4j-api'
     }
