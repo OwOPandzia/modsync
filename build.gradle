@@ -130,17 +130,23 @@ dependencies {
     // The group id is ignored when searching -- in this case, it is "blank"
     // implementation "blank:coolmod-${mc_version}:${coolmod_version}"
 
+    implementation('net.dv8tion:JDA:5.2.1') {
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude module: 'opus-java'
+    }
+    jarJar('net.dv8tion:JDA:5.2.1') {
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude module: 'opus-java'
+    }
+
+// OkHttp (JDA HTTP client)
     jarJar('com.squareup.okhttp3:okhttp:[4.12.0,5)') {}
     jarJar('com.squareup.okio:okio:[3.6.0,4)') {}
     jarJar('com.squareup.okio:okio-jvm:[3.6.0,4)') {}
 
-    implementation('net.dv8tion:JDA:5.2.1') {
-        exclude group: 'org.slf4j', module: 'slf4j-api'
-    }
-    jarJar('net.dv8tion:JDA:5.2.1') {
-        exclude module: 'opus-java'
-        exclude group: 'org.slf4j', module: 'slf4j-api'
-    }
+// Kotlin stdlib (required by OkHttp 4.x which is written in Kotlin)
+    jarJar('org.jetbrains.kotlin:kotlin-stdlib:[1.9.0,2)') {}
+    jarJar('org.jetbrains.kotlin:kotlin-stdlib-common:[1.9.0,2)') {}
 
     // Example mod dependency using a file as dependency
     // implementation files("libs/coolmod-${mc_version}-${coolmod_version}.jar")
