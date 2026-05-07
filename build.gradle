@@ -131,14 +131,17 @@ dependencies {
     // The group id is ignored when searching -- in this case, it is "blank"
     // implementation "blank:coolmod-${mc_version}:${coolmod_version}"
 
+    additionalRuntimeClasspath 'net.dv8tion:JDA:5.2.1'
+
     // Declare JDA once for compile + the new config
-    implementation('net.dv8tion:JDA:5.2.1') {
+    jarJar(implementation('net.dv8tion:JDA:5.2.1') {
         exclude group: 'org.slf4j', module: 'slf4j-api'
         exclude module: 'opus-java'
-    }
-    jdaJar('net.dv8tion:JDA:5.2.1') {
-        exclude group: 'org.slf4j', module: 'slf4j-api'
-        exclude module: 'opus-java'
+    }) {
+        version {
+            strictly '[5.2.1,6)'
+            prefer '5.2.1'
+        }
     }
 
     jdaJar('com.squareup.okio:okio:[3.6.0,4)') {
@@ -228,7 +231,6 @@ afterEvaluate {
             'io.netty:netty-resolver',
             'commons-io:commons-io',
             'org.apache.commons:commons-lang3',
-            'com.squareup.okio:okio',
             'com.google.code.gson:gson',
     ] as Set
 

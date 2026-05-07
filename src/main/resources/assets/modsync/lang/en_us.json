@@ -1,7 +1,5 @@
 {
   "itemGroup.modsync": "Example Mod Tab",
-  "block.modsync.example_block": "Example Block",
-  "item.modsync.example_item": "Example Item",
 
   "modsync.configuration.title": "Modsync Configs",
   "modsync.configuration.section.modsync.common.toml": "Modsync Configs",

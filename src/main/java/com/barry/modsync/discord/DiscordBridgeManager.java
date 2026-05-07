@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class DiscordBridgeManager {
 
@@ -49,56 +50,64 @@ public class DiscordBridgeManager {
             return;
         }
 
-        try {
-            jda = JDABuilder.createDefault(token)
-                    .enableIntents(GatewayIntent.GUILD_MESSAGES,
-                            GatewayIntent.MESSAGE_CONTENT)
-                    .addEventListeners(new DiscordJDAListener(this))
-                    .build()
-                    .awaitReady();
+        CompletableFuture.runAsync(() -> {
+            try {
+                jda = JDABuilder.createDefault(token)
+                        .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
+                        .addEventListeners(new DiscordJDAListener(this))
+                        .build()
+                        .awaitReady();
 
-            LOGGER.info("[ModSync/Discord] Connected as {}", jda.getSelfUser().getAsTag());
+                LOGGER.info("[ModSync/Discord] Connected as {}", jda.getSelfUser().getAsTag());
 
-            // Set bot avatar to server-icon.png if it exists
-            File icon = new File("server-icon.png");
-            if (icon.exists()) {
-                jda.getSelfUser().getManager()
-                        .setAvatar(Icon.from(icon))
-                        .queue(
-                                ok  -> LOGGER.info("[ModSync/Discord] Bot avatar set from server-icon.png"),
-                                err -> LOGGER.warn("[ModSync/Discord] Avatar update failed: {}", err.getMessage())
-                        );
+                // Set bot avatar to server-icon.png if it exists
+                File icon = new File("server-icon.png");
+                if (icon.exists()) {
+                    jda.getSelfUser().getManager()
+                            .setAvatar(Icon.from(icon))
+                            .queue(
+                                    ok  -> LOGGER.info("[ModSync/Discord] Bot avatar set from server-icon.png"),
+                                    err -> LOGGER.warn("[ModSync/Discord] Avatar update failed: {}", err.getMessage())
+                            );
+                }
+
+                updateActivity();
+                sendSystemEmbed("🟢 Server Online",
+                        "**" + serverName + "** has started.", COLOR_SERVER);
+
+            } catch (Exception e) {
+                LOGGER.error("[ModSync/Discord] Failed to start bot: {}", e.getMessage());
+                jda = null;
             }
-
-            updateActivity();
-            sendSystemEmbed("🟢 Server Online",
-                    "**" + serverName + "** has started.", COLOR_SERVER);
-
-        } catch (Exception e) {
-            LOGGER.error("[ModSync/Discord] Failed to start bot: {}", e.getMessage());
-            jda = null;
-        }
+        });
     }
 
     public void stop() {
-        if (jda == null) return;
-        sendSystemEmbed("🔴 Server Offline",
-                "**" + serverName + "** has shut down.", COLOR_LEAVE);
-        // Brief pause so the shutdown embed can be sent before JDA closes
-        try { Thread.sleep(2_500); } catch (InterruptedException ignored) {}
-        jda.shutdown();
-        jda = null;
-        LOGGER.info("[ModSync/Discord] Bot disconnected.");
+        CompletableFuture.runAsync(() -> {
+            if (jda == null) return;
+            sendSystemEmbed("🔴 Server Offline",
+                    "**" + serverName + "** has shut down.", COLOR_LEAVE);
+            // Brief pause so the shutdown embed can be sent before JDA closes
+            try {
+                Thread.sleep(2_500);
+            } catch (InterruptedException ignored) {
+            }
+            jda.shutdown();
+            jda = null;
+            LOGGER.info("[ModSync/Discord] Bot disconnected.");
+        });
     }
 
     // ── Activity ─────────────────────────────────────────────────────────────
 
     public void updateActivity() {
-        if (jda == null || server == null) return;
-        int online = server.getPlayerList().getPlayerCount();
-        int max    = server.getPlayerList().getMaxPlayers();
-        jda.getPresence().setActivity(
-                Activity.playing(serverName + " | " + online + "/" + max + " players"));
+        CompletableFuture.runAsync(() -> {
+            if (jda == null || server == null) return;
+            int online = server.getPlayerList().getPlayerCount();
+            int max = server.getPlayerList().getMaxPlayers();
+            jda.getPresence().setActivity(
+                    Activity.playing(serverName + " | " + online + "/" + max + " players"));
+        });
     }
 
     // ── Minecraft → Discord ──────────────────────────────────────────────────
